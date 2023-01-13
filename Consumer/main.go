@@ -10,6 +10,7 @@ const (
 	URL          = "amqp://guest:guest@localhost:5672/"
 	EXCHANGENAME = "logs"
 	QUEUENAME    = "logs_consumer"
+	ROUTINGKEY   = "LOGS.ERRORS"
 )
 
 func failOnError(err error, msg string) {
