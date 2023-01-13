@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -10,8 +11,11 @@ import (
 
 const (
 	URL          = "amqp://guest:guest@localhost:5672/"
-	EXCHANGENAME = "logs"
-	QUEUENAME    = "logs_consumer"
+	EXCHANGENAME = "New"
+	ROUTINGKEY   = "logs"
+	ROUTINGKEY1  = "log"
+
+	QUEUENAME = "test_logs"
 )
 
 func failOnError(err error, msg string) {
@@ -25,24 +29,27 @@ func main() {
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to create a channel")
-
-	failOnError(ch.ExchangeDeclare(EXCHANGENAME, "fanout", false, true, false, false, nil), "FAILED TO declare exchange")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//Direct binding can be a fanout with a routing key
+	failOnError(ch.ExchangeDeclare(EXCHANGENAME, "direct", true, false, false, false, nil), "FAILED TO declare exchange")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	for i := 0; i < 100; i++ {
-		err = ch.PublishWithContext(ctx,
-			"logs", // exchange
-			"",     // routing key
-			false,  // mandatory
-			false,  // immediate
-			amqp.Publishing{
+
+	for i := 0; i < 1000; i++ {
+
+		if i%2 == 0 {
+			ch.PublishWithContext(ctx, EXCHANGENAME, ROUTINGKEY, false, false, amqp.Publishing{
 				ContentType: "text/plain",
-				Body:        []byte("body"),
+				Body:        []byte(fmt.Sprintf("body %d", i)),
 			})
-		failOnError(err, "Failed to publish a message")
+			log.Println(i)
+		} else {
+			ch.PublishWithContext(ctx, EXCHANGENAME, ROUTINGKEY1, false, false, amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(fmt.Sprintf("body %d", i)),
+			})
+			log.Println(i)
+		}
 		time.Sleep(3 * time.Second)
 	}
-
 	log.Printf(" [x] Sent %s", "Done")
 }
