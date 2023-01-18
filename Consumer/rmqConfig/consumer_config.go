@@ -95,7 +95,6 @@ func (c *ConsumerRabbitMQ) handleConsumer(d amqp.Delivery) error {
 	case TypeUpdate:
 
 	}
-	c.Amqpchan <- received
 
 	return nil
 }

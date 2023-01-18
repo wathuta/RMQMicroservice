@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"time"
 )
 
 var (
@@ -56,7 +55,7 @@ func (h *userHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) CREATE(w http.ResponseWriter, r *http.Request) {
 }
 func (h *userHandler) LIST(w http.ResponseWriter, r *http.Request) {
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 200; i++ {
 		message := models.Message{
 			Type:  TypeGet,
 			Value: fmt.Sprintf("hello world %d", i),
@@ -67,7 +66,7 @@ func (h *userHandler) LIST(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 		}
 		h.rmq.Publish(r.Context(), pubMessage)
-		time.Sleep(3 * time.Millisecond)
+		log.Printf("published %d", i)
 	}
 }
 func (h *userHandler) UPDATE(w http.ResponseWriter, r *http.Request) {

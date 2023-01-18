@@ -1,9 +1,13 @@
 package services
 
 import (
+	"RMQConsumer/models"
 	rmqconfig "RMQConsumer/rmqConfig"
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"time"
 )
 
 const (
@@ -54,21 +58,19 @@ func (u *userService) CREATE(ctx context.Context, req interface{}) {
 
 }
 func (u *userService) LIST(ctx context.Context, req interface{}) {
-	// for i := 0; i < 1000; i++ {
-	// 	message := models.Message{
-	// 		Type:  TypeGet,
-	// 		Value: fmt.Sprintf("hello world %d", i),
-	// 	}
-	// 	pubMessage, err := json.Marshal(message)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 		return
-	// 	}
-	// 	u.rmq.Publish(ctx, pubMessage)
-	// 	log.Println("Publishing", message)
-	// 	time.Sleep(3 * time.Second)
-	// }
-	log.Println(req, "here")
+	message := models.Message{
+		Type:  TypeGet,
+		Value: fmt.Sprintf("hello world %d", req),
+	}
+	pubMessage, err := json.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	u.rmq.Publish(ctx, pubMessage)
+	time.Sleep(1 * time.Second)
+	log.Println("Publishing", message)
+	log.Println(req, "here/n")
 }
 func (u *userService) UPDATE(ctx context.Context, req interface{}) {
 

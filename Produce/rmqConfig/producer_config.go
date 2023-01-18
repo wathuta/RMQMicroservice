@@ -60,6 +60,4 @@ func (r *RabbitMQPublisher) Publish(ctx context.Context, byteArr []byte) {
 	}); err != nil {
 		log.Fatal(err)
 	}
-	time.Sleep(30 * time.Microsecond)
-	log.Println("Published successfully")
 }
